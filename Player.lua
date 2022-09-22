@@ -42,6 +42,21 @@ function Player(debugging)
         self.x - self.radius * (2 / 3 * math.cos(self.angle) - math.sin(self.angle)),
         self.y + self.radius * (2 / 3 * math.sin(self.angle) + math.cos(self.angle))
       )
+    end,
+
+    movePlayer = function (self)
+      local FPS = love.timer.getFPS()
+      local friction = 0.7
+    
+      self.rotation = 360 / 180 * math.pi / FPS
+    
+      if love.keyboard.isDown("a") or love.keyboard.isDown("left") or love.keyboard.isDown("kp4") then
+        self.angle = self.angle + self.rotation
+      end
+    
+      if love.keyboard.isDown("s") or love.keyboard.isDown("right") or love.keyboard.isDown("kp6") then
+        self.angle = self.angle - self.rotation
+      end
     end
   }
 end

@@ -16,6 +16,8 @@ end
 
 function love.update()
   _G.mouse_x, _G.mouse_y = love.mouse.getPosition()
+
+  player:movePlayer()
 end
 
 function love.draw()
