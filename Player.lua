@@ -24,6 +24,13 @@ function Player(debugging)
     draw = function (self)
       local opacity = 1
 
+      if debugging then
+        love.graphics.setColor(1, 0, 0)
+
+        love.graphics.rectangle("fill", self.x - 1, self.y - 1, 2, 2)
+
+        love.graphics.circle("line", self.x, self.y, self.radius)
+      end
       love.graphics.setColor(1, 1, 1, opacity)
 
       love.graphics.polygon(
