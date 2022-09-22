@@ -18,7 +18,7 @@ function Player(debugging)
     thrust = {
       x = 0,
       y = 0,
-      speed = 0
+      speed = 5
     },
 
     draw = function (self)
@@ -54,9 +54,22 @@ function Player(debugging)
         self.angle = self.angle + self.rotation
       end
     
-      if love.keyboard.isDown("s") or love.keyboard.isDown("right") or love.keyboard.isDown("kp6") then
+      if love.keyboard.isDown("d") or love.keyboard.isDown("right") or love.keyboard.isDown("kp6") then
         self.angle = self.angle - self.rotation
       end
+
+      if self.thrusting then
+        self.thrust.x = self.thrust.x + self.thrust.speed * math.cos(self.angle) / FPS
+        self.thrust.y = self.thrust.y - self.thrust.speed * math.sin(self.angle) / FPS
+      else
+        if self.thrust.x ~= 0 or self.thrust.y ~= 0 then
+          self.thrust.x = self.thrust.x - friction * self.thrust.x / FPS
+          self.thrust.y = self.thrust.y - friction * self.thrust.y / FPS
+        end
+      end
+
+      self.x = self.x + self.thrust.x
+      self.y = self.y + self.thrust.y
     end
   }
 end
