@@ -1,4 +1,4 @@
--- https://youtu.be/I549C6SmUnk?t=20115
+-- https://www.youtube.com/watch?v=I549C6SmUnk&t=22232s
 ---@diagnostic disable: lowercase-global
 
 local love = require "love"
@@ -35,4 +35,8 @@ end
 
 function love.draw()
   player:draw()
+
+  love.graphics.setColor(1, 1, 1, 1)
+
+  love.graphics.print(love.timer.getFPS(), 10, 10)
 end
