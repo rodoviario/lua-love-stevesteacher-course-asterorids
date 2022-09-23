@@ -25,7 +25,7 @@ function Player(debugging)
 
     drawFlameThrust = function (self, fillType, color)
       love.graphics.setColor(color)
-      
+
       love.graphics.polygon(
         fillType,
         self.x - self.radius * (2 / 3 * math.cos(self.angle) + 0.5 * math.sin(self.angle)),
@@ -106,6 +106,10 @@ function Player(debugging)
 
       self.x = self.x + self.thrust.x
       self.y = self.y + self.thrust.y
+
+      if self.x + self.radius < 0 then
+        self.x = love.graphics.getWidth() + self.radius
+      end
     end
   }
 end
