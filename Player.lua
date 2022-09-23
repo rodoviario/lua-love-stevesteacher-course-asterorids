@@ -109,6 +109,8 @@ function Player(debugging)
 
       if self.x + self.radius < 0 then
         self.x = love.graphics.getWidth() + self.radius
+      elseif self.x - self.radius > love.graphics.getWidth() then
+        self.x = - self.radius
       end
     end
   }
