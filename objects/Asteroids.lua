@@ -59,6 +59,11 @@ function Asteroids(x, y, ast_size, level, debugging)
         love.graphics.circle("line", self.x, self.y, self.radius)
       end
 
+    end,
+
+    move = function (self, dt)
+      self.x = self.x + self.x_vel * dt
+      self.y = self.y + self.y_vel * dt
     end
   }
 end
