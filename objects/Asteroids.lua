@@ -64,6 +64,18 @@ function Asteroids(x, y, ast_size, level, debugging)
     move = function (self, dt)
       self.x = self.x + self.x_vel * dt
       self.y = self.y + self.y_vel * dt
+
+      if self.x + self.radius < 0 then
+        self.x = love.graphics.getWidth() + self.radius
+      elseif self.x - self.radius > love.graphics.getWidth() then
+        self.x = - self.radius
+      end
+
+      if self.y + self.radius < 0 then
+        self.y = love.graphics.getHeight() + self.radius
+      elseif self.y - self.radius > love.graphics.getHeight() then
+        self.y = - self.radius
+      end
     end
   }
 end
