@@ -1,9 +1,9 @@
--- https://youtu.be/I549C6SmUnk?t=23510
+-- https://www.youtube.com/watch?v=I549C6SmUnk&t=23927s
 ---@diagnostic disable: lowercase-global
 
 local love = require "love"
 
-local Player = require "Player"
+local Player = require "objects/Player"
 local Game = require "states/Game"
 
 function love.load()
@@ -50,7 +50,11 @@ function love.update()
 end
 
 function love.draw()
-  player:draw()
+  if game.state.running or game.state.paused then
+    player:draw()
+    
+    game:draw(game.state.paused)
+  end
 
   love.graphics.setColor(1, 1, 1, 1)
 
