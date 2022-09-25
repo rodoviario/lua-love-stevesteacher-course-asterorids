@@ -1,6 +1,7 @@
 ---@diagnostic disable: lowercase-global
 
 local love = require "love"
+local Laser = require "objects.Laser"
 
 function Player(debugging)
   local SHIP_SIZE = 30
@@ -14,6 +15,7 @@ function Player(debugging)
     radius = SHIP_SIZE / 2,
     angle = VIEW_ANGLE,
     rotation = 0,
+    lasers = {},
     thrusting = false,
     thrust = {
       x = 0,
@@ -35,6 +37,14 @@ function Player(debugging)
         self.x - self.radius * (2 / 3 * math.cos(self.angle) - 0.5 * math.sin(self.angle)),
         self.y + self.radius * (2 / 3 * math.sin(self.angle) + 0.5 * math.cos(self.angle))
         )
+    end,
+
+    shootLaser = function (self)
+      table.insert(self.lasers, Laser(
+        self.x,
+        self.y,
+        self.angle
+      ))
     end,
 
     draw = function (self, faded)
@@ -81,6 +91,10 @@ function Player(debugging)
         self.x - self.radius * (2 / 3 * math.cos(self.angle) - math.sin(self.angle)),
         self.y + self.radius * (2 / 3 * math.sin(self.angle) + math.cos(self.angle))
       )
+
+      for _, laser in pairs(self.lasers) do
+        laser:draw(faded)
+      end
     end,
 
     movePlayer = function (self)

@@ -1,4 +1,4 @@
--- https://www.youtube.com/watch?v=I549C6SmUnk&t=25360s
+-- https://www.youtube.com/watch?v=I549C6SmUnk&t=27692s
 ---@diagnostic disable: lowercase-global
 
 local love = require "love"
@@ -26,6 +26,10 @@ function love.keypressed(key)
         player.thrusting = true
     end
 
+    if key == "space" or key == "down" or key == "kp5" then
+      player:shootLaser()
+    end
+
     if key == "escape" then
       game:changeGameState("paused")
     end
@@ -39,6 +43,14 @@ end
 function love.keyreleased(key)
   if key == "w" or key == "up" or key == "kp8" then
       player.thrusting = false
+  end
+end
+
+function love.mousepressed(x, y, button, istouch, presses)
+  if button == 1 then
+    if game.state.running then
+      player:shootLaser()
+    end
   end
 end
 
