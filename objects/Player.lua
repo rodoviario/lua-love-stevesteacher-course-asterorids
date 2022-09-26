@@ -7,7 +7,7 @@ function Player(debugging)
   local SHIP_SIZE = 30
   local VIEW_ANGLE = math.rad(90)
   local LASER_DISTANCE = 0.6
-  local MAX_LASERS = 10
+  local MAX_LASERS = 3
 
   debugging = debugging or false
 
@@ -42,11 +42,13 @@ function Player(debugging)
     end,
 
     shootLaser = function (self)
-      table.insert(self.lasers, Laser(
-        self.x,
-        self.y,
-        self.angle
-      ))
+      if #self.lasers <= MAX_LASERS then
+        table.insert(self.lasers, Laser(
+          self.x,
+          self.y,
+          self.angle
+        ))
+      end
     end,
 
     destroyLaser = function (self, index)
