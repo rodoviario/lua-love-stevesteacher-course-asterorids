@@ -42,7 +42,7 @@ function Player(debugging)
     end,
 
     shootLaser = function (self)
-      if #self.lasers <= MAX_LASERS then
+      if #self.lasers < MAX_LASERS then
         table.insert(self.lasers, Laser(
           self.x,
           self.y,
