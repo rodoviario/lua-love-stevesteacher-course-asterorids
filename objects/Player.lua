@@ -135,6 +135,10 @@ function Player(debugging)
       elseif self.y - self.radius > love.graphics.getHeight() then
         self.y = - self.radius
       end
+
+      for index, laser in pairs(self.lasers) do
+        laser:move()
+      end
     end
   }
 end
