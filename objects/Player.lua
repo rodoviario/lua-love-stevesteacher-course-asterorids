@@ -6,6 +6,8 @@ local Laser = require "objects.Laser"
 function Player(debugging)
   local SHIP_SIZE = 30
   local VIEW_ANGLE = math.rad(90)
+  local LASER_DISTANCE = 0.6
+  local MAX_LASERS = 10
 
   debugging = debugging or false
 
@@ -45,6 +47,10 @@ function Player(debugging)
         self.y,
         self.angle
       ))
+    end,
+
+    destroyLaser = function (self, index)
+      table.remove(self.lasers, index)
     end,
 
     draw = function (self, faded)
@@ -138,6 +144,10 @@ function Player(debugging)
 
       for index, laser in pairs(self.lasers) do
         laser:move()
+
+        if (laser.distance > LASER_DISTANCE * love.graphics.getWidth()) then
+          self.destroyLaser(self, index)
+        end
       end
     end
   }
