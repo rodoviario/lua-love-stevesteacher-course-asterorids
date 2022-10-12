@@ -1,6 +1,7 @@
--- https://www.youtube.com/watch?v=I549C6SmUnk&t=27692s
+-- https://www.youtube.com/watch?v=I549C6SmUnk&t=32274s
 ---@diagnostic disable: lowercase-global
 
+require "globals"
 local love = require "love"
 
 local Player = require "objects/Player"
@@ -14,13 +15,12 @@ function love.load()
 
   local show_debugging = true
 
-  player = Player(show_debugging)
+  player = Player()
   game = Game()
   game:startNewGame(player)
 end
 
 function love.keypressed(key)
-    
   if game.state.running then
     if key == "w" or key == "up" or key == "kp8" then
         player.thrusting = true
@@ -54,7 +54,6 @@ function love.mousepressed(x, y, button, istouch, presses)
   end
 end
 
-
 function love.update(dt)
   _G.mouse_x, _G.mouse_y = love.mouse.getPosition()
 
@@ -62,6 +61,46 @@ function love.update(dt)
     player:movePlayer()
 
     for ast_index, asteroid in pairs(_G.asteroids) do
+      if not player.exploading then
+        if _G.calculateDistance(player.x, player.y, asteroid.x, asteroid.y) < asteroid.radius then
+          player:expload()
+          destroy_ast = true
+        end
+      else
+        player.expload_time = player.expload_time - 1
+
+        if player.expload_time == 0 then
+          if player.lives - 1 <= 0 then
+            game:changeGameState("ended")
+            return
+          end
+
+          player = Player(player.lives - 1)
+        end
+      end
+      
+      for _, laser in pairs(player.lasers) do
+        if _G.calculateDistance(laser.x, laser.y, asteroid.x, asteroid.y) < asteroid.radius then
+          laser:expload()
+          asteroid:destroy(asteroids, ast_index, game)
+        end
+      end
+
+      -- Hay que esperar un poco al colisionar por 3ra vez con el asteroide
+      -- y prevenir que el último asteroide desaparezca en esa colisión
+      -- para prevenir un bug aparentemente, eso dice el tutorial.
+      -- Sería imposible perder la última vida y al mismo tiempo pasar de nivel
+      if destroy_ast then
+        if player.lives - 1 <= 0 then
+          if player.expload_time == 0 then
+            destroy_ast = false
+            asteroid:destroy(asteroids, ast_index, game)
+        else
+          destroy_ast = false
+          asteroid:destroy(asteroids, ast_index, game)
+        end
+      end
+
       asteroid:move(dt)
     end
     
@@ -71,6 +110,7 @@ end
 
 function love.draw()
   if game.state.running or game.state.paused then
+    player:drawLives(game.state.paused)
     player:draw(game.state.paused)
 
     for _, asteroid in pairs(_G.asteroids) do

@@ -1,16 +1,16 @@
+require "globals"
+
 local love = require "love"
 
-function Asteroids(x, y, ast_size, level, debugging)
-  debugging = debugging or false
+function Asteroids(x, y, ast_size, level)
 
   local ASTEROID_VERT = 10
   local ASTEROID_JAG = 0.4
   local ASTEROID_SPEED = math.random(50) + (level * 2)
 
   local vert = math.floor(math.random(ASTEROID_VERT + 1) + ASTEROID_VERT / 2)
-
   local offset = {}
-  for i = 1, vert + 1, 1 do
+  for i = 1, vert + 1 do
     table.insert(offset, math.random() * ASTEROID_JAG * 2 + 1 - ASTEROID_JAG)
   end
 
@@ -53,7 +53,7 @@ function Asteroids(x, y, ast_size, level, debugging)
         points
       )
 
-      if debugging then
+      if _G.show_debugging then
         love.graphics.setColor(1, 0, 0)
 
         love.graphics.circle("line", self.x, self.y, self.radius)
@@ -68,14 +68,27 @@ function Asteroids(x, y, ast_size, level, debugging)
       if self.x + self.radius < 0 then
         self.x = love.graphics.getWidth() + self.radius
       elseif self.x - self.radius > love.graphics.getWidth() then
-        self.x = - self.radius
+        self.x = -self.radius
       end
 
       if self.y + self.radius < 0 then
         self.y = love.graphics.getHeight() + self.radius
       elseif self.y - self.radius > love.graphics.getHeight() then
-        self.y = - self.radius
+        self.y = -self.radius
       end
+    end,
+
+    destroy = function (self, asteroids_tbl, index, game)
+      local MIN_ASTEROID_SIZE = math.ceil(ASTEROID_SIZE / 8)
+  
+      -- split asteroid if it's still bigger than the min size
+      if self.radius > MIN_ASTEROID_SIZE then
+          -- size will automatically half, since radius is / 2 when converted to new radius
+          table.insert(asteroids_tbl,  Asteroids(self.x, self.y, self.radius, game.level))
+          table.insert(asteroids_tbl,  Asteroids(self.x, self.y, self.radius, game.level))
+      end
+  
+      table.remove(asteroids_tbl, index) -- remove ourself
     end
   }
 end
