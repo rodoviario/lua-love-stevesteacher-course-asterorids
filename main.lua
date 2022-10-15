@@ -1,4 +1,4 @@
--- https://www.youtube.com/watch?v=I549C6SmUnk&t=32274s
+-- https://www.youtube.com/watch?v=I549C6SmUnk&t=34251s
 ---@diagnostic disable: lowercase-global
 
 require "globals"
@@ -6,6 +6,7 @@ local love = require "love"
 
 local Player = require "objects/Player"
 local Game = require "states/Game"
+local Menu = require "states/Menu"
 
 math.randomseed(os.time())
 
@@ -13,11 +14,11 @@ function love.load()
   love.mouse.setVisible(false)
   _G.mouse_x, _G.mouse_y = 0, 0
 
-  local show_debugging = true
+  -- local show_debugging = true
 
   player = Player()
   game = Game()
-  game:startNewGame(player)
+  menu = Menu(game, player)
 end
 
 function love.keypressed(key)
@@ -50,6 +51,8 @@ function love.mousepressed(x, y, button, istouch, presses)
   if button == 1 then
     if game.state.running then
       player:shootLaser()
+    else
+      clickedMouse = true
     end
   end
 end
@@ -95,6 +98,7 @@ function love.update(dt)
           if player.expload_time == 0 then
             destroy_ast = false
             asteroid:destroy(asteroids, ast_index, game)
+          end
         else
           destroy_ast = false
           asteroid:destroy(asteroids, ast_index, game)
@@ -103,9 +107,11 @@ function love.update(dt)
 
       asteroid:move(dt)
     end
-    
-  end
+  elseif game.state.menu then
+    menu:run(clickedMouse)
 
+    clickedMouse = false
+  end
 end
 
 function love.draw()
@@ -118,9 +124,15 @@ function love.draw()
     end
     
     game:draw(game.state.paused)
+  elseif game.state.menu then
+    menu:draw()
   end
 
   love.graphics.setColor(1, 1, 1, 1)
+
+  if not game.state.running then
+    love.graphics.circle("fill", mouse_x, mouse_y, 10)
+  end
 
   love.graphics.print(love.timer.getFPS(), 10, 10)
 end
