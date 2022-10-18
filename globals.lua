@@ -14,7 +14,7 @@ end
 --   return math.sqrt(((x2 - x1) ^ 2) + ((y2 - y1) ^ 2))
 -- end
 
-function readJSON(file_name)
+function readJSON(file_name) --this needs to ne installed with luarocks
   local file = io.open("src/data/" .. file_name .. ".json", "r")
   local data = file:read("*all")
   file:close()
