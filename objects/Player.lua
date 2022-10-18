@@ -9,7 +9,8 @@ function Player(num_lives)
   local EXPLOAD_DUR = 3
   local VIEW_ANGLE = math.rad(90)
   local LASER_DISTANCE = 0.6
-  local MAX_LASERS = 5
+  local MAX_LASERS = 10
+  local USABLE_BLINKS = 10 * 2
 
   return {
     x = love.graphics.getWidth() / 2,
@@ -19,6 +20,9 @@ function Player(num_lives)
     rotation = 0,
     expload_time = 0,
     exploading = false,
+    invincible = true,
+    invincible_seen = true,
+    time_blinked = USABLE_BLINKS,
     lasers = {},
     thrusting = false,
     thrust = {
@@ -31,6 +35,10 @@ function Player(num_lives)
     lives = num_lives or 3,
 
     drawFlameThrust = function (self, fillType, color)
+      if self.invincible_seen then
+        table.insert(color, 0.5)
+      end
+
       love.graphics.setColor(color)
 
       love.graphics.polygon(
@@ -60,6 +68,7 @@ function Player(num_lives)
 
     draw = function (self, faded)
       local opacity = 1
+
       if faded then
         opacity = 0.2
       end
@@ -83,6 +92,7 @@ function Player(num_lives)
           self:drawFlameThrust("fill", { 255 / 255, 102 / 255, 25 / 255 })
           self:drawFlameThrust("line", { 1, 0.16, 0 })
         end
+
         if _G.show_debugging then
           love.graphics.setColor(1, 0, 0)
   
@@ -90,8 +100,12 @@ function Player(num_lives)
   
           love.graphics.circle("line", self.x, self.y, self.radius)
         end
-  
-        love.graphics.setColor(1, 1, 1, opacity)
+
+        if self.invincible_seen then
+          love.graphics.setColor(1, 1, 1, faded and opacity or 0.5)
+        else
+          love.graphics.setColor(1, 1, 1, opacity)
+        end
   
         love.graphics.polygon(
           "line",
@@ -155,7 +169,23 @@ function Player(num_lives)
       end
     end,
 
-    movePlayer = function (self)
+    movePlayer = function (self, dt)
+      if self.invincible then
+        self.time_blinked = self.time_blinked - dt * 2
+
+        if math.ceil(self.time_blinked) % 2 == 0 then
+          self.invincible_seen = false
+        else
+          self.invincible_seen = true
+        end
+
+        if self.time_blinked <= 0 then
+          self.invincible_seen = false
+        end
+      else
+        self.time_blinked = USABLE_BLINKS
+        self.invincible_seen = false
+      end
       self.exploading = self.expload_time > 0
 
       if not self.exploading then

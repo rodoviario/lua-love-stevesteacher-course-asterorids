@@ -63,10 +63,10 @@ function love.update(dt)
   _G.mouse_x, _G.mouse_y = love.mouse.getPosition()
 
   if game.state.running then
-    player:movePlayer()
+    player:movePlayer(dt)
 
     for ast_index, asteroid in pairs(_G.asteroids) do
-      if not player.exploading then
+      if not player.exploading and not player.invincible then
         if _G.calculateDistance(player.x, player.y, asteroid.x, asteroid.y) < asteroid.radius then
           player:expload()
           destroy_ast = true
@@ -108,6 +108,11 @@ function love.update(dt)
       end
 
       asteroid:move(dt)
+    end
+
+    if #asteroids == 0 then
+      game.level = game.level + 1
+      game:startNewGame(player)
     end
   elseif game.state.menu then
     menu:run(clickedMouse)
