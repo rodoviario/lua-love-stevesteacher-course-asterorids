@@ -1,4 +1,4 @@
--- https://www.youtube.com/watch?v=I549C6SmUnk&t=34251s
+-- https://www.youtube.com/watch?v=I549C6SmUnk&t=34938s
 ---@diagnostic disable: lowercase-global
 
 require "globals"
@@ -12,12 +12,14 @@ math.randomseed(os.time())
 
 function love.load()
   love.mouse.setVisible(false)
+  local save_data = readJSON("save")
+
   _G.mouse_x, _G.mouse_y = 0, 0
 
   -- local show_debugging = true
 
   player = Player()
-  game = Game()
+  game = Game(save_data)
   menu = Menu(game, player)
 end
 
