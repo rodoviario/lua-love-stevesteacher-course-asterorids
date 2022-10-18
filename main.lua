@@ -1,4 +1,4 @@
--- https://www.youtube.com/watch?v=I549C6SmUnk&t=34938s
+-- https://www.youtube.com/watch?v=I549C6SmUnk&t=36716s
 ---@diagnostic disable: lowercase-global
 
 require "globals"
@@ -18,7 +18,7 @@ function love.load()
 
   -- local show_debugging = true
 
-  player = Player()
+  player = Player(3)
   game = Game(save_data)
   menu = Menu(game, player)
 end
@@ -111,7 +111,6 @@ function love.update(dt)
     end
   elseif game.state.menu then
     menu:run(clickedMouse)
-
     clickedMouse = false
   end
 end
@@ -128,6 +127,8 @@ function love.draw()
     game:draw(game.state.paused)
   elseif game.state.menu then
     menu:draw()
+  elseif game.state.ended then
+    game:draw()
   end
 
   love.graphics.setColor(1, 1, 1, 1)
