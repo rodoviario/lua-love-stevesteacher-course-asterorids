@@ -2,8 +2,7 @@ local love = require "love"
 
 local Text = require "../components/Text"
 
-function Button(func, text_color, button_color, width, height,
-  text, text_align, font_size, button_x, button_y, text_x, text_y)
+function Button(func, text_color, button_color, width, height, text, text_align, font_size, button_x, button_y, text_x, text_y)
   local btn_text = {}
   func = func or function () print("This button has no function attached") end
 
@@ -50,10 +49,8 @@ function Button(func, text_color, button_color, width, height,
     end,
 
     checkHover = function (self, mouse_x, mouse_y, cursor_radius)
-      if (mouse_x + cursor_radius >= self.button_x) and
-      (mouse_x - cursor_radius <= self.button_x + self.width) then
-        if (mouse_y + cursor_radius >= self.button_y) and
-        (mouse_y - cursor_radius <= self.button_y + self.height) then
+      if (mouse_x + cursor_radius >= self.button_x) and (mouse_x - cursor_radius <= self.button_x + self.width) then
+        if (mouse_y + cursor_radius >= self.button_y) and (mouse_y - cursor_radius <= self.button_y + self.height) then
           return true
         end
       end
@@ -81,7 +78,7 @@ function Button(func, text_color, button_color, width, height,
 
     getTextPos = function (self)
       return self.text_x, self.text_y
-    end,
+    end
   }
 end
 

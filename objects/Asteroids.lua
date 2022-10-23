@@ -91,7 +91,7 @@ function Asteroids(x, y, ast_size, level)
       if self.radius >= ASTEROID_SIZE / 2 then
         game.score = game.score + 20
 
-      elseif self.radius >= MIN_ASTEROID_SIZE then
+      elseif self.radius <= MIN_ASTEROID_SIZE then
         game.score = game.score + 100
 
       else

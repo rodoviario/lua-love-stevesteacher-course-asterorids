@@ -1,28 +1,37 @@
--- https://www.youtube.com/watch?v=I549C6SmUnk&t=36716s
+-- https://www.youtube.com/watch?v=I549C6SmUnk&t=37867s
 ---@diagnostic disable: lowercase-global
 
 require "globals"
+
 local love = require "love"
 
 local Player = require "objects/Player"
 local Game = require "states/Game"
 local Menu = require "states/Menu"
+local reset_complete = false
 
 math.randomseed(os.time())
 
+function reset()
+  local save_data = readJSON("save")
+
+  player = Player(3)
+  game = Game(save_data)
+  menu = Menu(game, player)
+  destroy_ast = false
+end
+
 function love.load()
   love.mouse.setVisible(false)
-  local save_data = readJSON("save")
 
   _G.mouse_x, _G.mouse_y = 0, 0
 
   -- local show_debugging = true
 
-  player = Player(3)
-  game = Game(save_data)
-  menu = Menu(game, player)
+  reset()
 end
 
+-- keys
 function love.keypressed(key)
   if game.state.running then
     if key == "w" or key == "up" or key == "kp8" then
@@ -58,6 +67,7 @@ function love.mousepressed(x, y, button, istouch, presses)
     end
   end
 end
+-- keys end
 
 function love.update(dt)
   _G.mouse_x, _G.mouse_y = love.mouse.getPosition()
@@ -67,7 +77,7 @@ function love.update(dt)
 
     for ast_index, asteroid in pairs(_G.asteroids) do
       if not player.exploading and not player.invincible then
-        if _G.calculateDistance(player.x, player.y, asteroid.x, asteroid.y) < asteroid.radius then
+        if _G.calculateDistance(player.x, player.y, asteroid.x, asteroid.y) < player.radius + asteroid.radius then
           player:expload()
           destroy_ast = true
         end
@@ -87,7 +97,7 @@ function love.update(dt)
       for _, laser in pairs(player.lasers) do
         if _G.calculateDistance(laser.x, laser.y, asteroid.x, asteroid.y) < asteroid.radius then
           laser:expload()
-          asteroid:destroy(asteroids, ast_index, game)
+          asteroid:destroy(_G.asteroids, ast_index, game)
         end
       end
 
@@ -99,24 +109,31 @@ function love.update(dt)
         if player.lives - 1 <= 0 then
           if player.expload_time == 0 then
             destroy_ast = false
-            asteroid:destroy(asteroids, ast_index, game)
+            asteroid:destroy(_G.asteroids, ast_index, game)
           end
         else
           destroy_ast = false
-          asteroid:destroy(asteroids, ast_index, game)
+          asteroid:destroy(_G.asteroids, ast_index, game)
         end
       end
 
       asteroid:move(dt)
     end
 
-    if #asteroids == 0 then
+    if #_G.asteroids == 0 then
       game.level = game.level + 1
       game:startNewGame(player)
     end
   elseif game.state.menu then
     menu:run(clickedMouse)
     clickedMouse = false
+
+    if not reset_complete then
+      reset()
+      reset_complete = true
+    end
+  elseif game.state.ended then
+    reset_complete = false
   end
 end
 

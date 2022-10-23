@@ -1,6 +1,6 @@
 local love = require "love"
 
-require "globals"
+-- require "globals"
 
 local Text = require "../components/Text"
 local Asteroids = require "../objects/Asteroids"
@@ -18,6 +18,12 @@ function Game(save_data)
     high_score = save_data.high_score or 0,
     screen_text = {},
     game_over_showing = false,
+
+    saveGame = function (self)
+      writeJSON("save", {
+          high_score = self.high_score
+      })
+    end;
 
     changeGameState = function (self, state)
       self.state.menu = state == "menu"
@@ -45,6 +51,8 @@ function Game(save_data)
       }
 
       self.game_over_showing = true
+
+      self:saveGame()
     end,
 
     draw = function (self, faded)
@@ -108,14 +116,13 @@ function Game(save_data)
     startNewGame = function (self, player)
       if player.lives <= 0 then
         self:changeGameState("ended")
+        return
       else
         self:changeGameState("running")
       end
 
       local num_asteroids = 0
-
       _G.asteroids = {}
-
       self.screen_text = {
         Text(
           "Level " .. self.level,
@@ -138,7 +145,7 @@ function Game(save_data)
           as_y = math.floor(math.random(love.graphics.getHeight()))
         until calculateDistance(player.x, player.y, as_x, as_y) > ASTEROID_SIZE * 2 + player.radius
 
-        table.insert(_G.asteroids, 1, Asteroids(as_x, as_y, ASTEROID_SIZE, self.level))
+        table.insert(_G.asteroids, i, Asteroids(as_x, as_y, ASTEROID_SIZE, self.level))
       end
     end
   }

@@ -2,6 +2,7 @@
 require "globals" --is not mandatory, lua will auto import this, but just in case
 
 local love = require "love"
+
 local Laser = require "objects/Laser"
 
 function Player(num_lives)
@@ -20,11 +21,11 @@ function Player(num_lives)
     rotation = 0,
     expload_time = 0,
     exploading = false,
+    thrusting = false,
     invincible = true,
     invincible_seen = true,
     time_blinked = USABLE_BLINKS,
     lasers = {},
-    thrusting = false,
     thrust = {
       x = 0,
       y = 0,
@@ -53,7 +54,7 @@ function Player(num_lives)
     end,
 
     shootLaser = function (self)
-      if (#self.lasers < MAX_LASERS) then
+      if (#self.lasers <= MAX_LASERS) then
         table.insert(self.lasers, Laser(
           self.x + ((4 / 3) * self.radius) * math.cos(self.angle),
           self.y -  ((4 / 3) * self.radius) * math.sin(self.angle),
@@ -117,6 +118,9 @@ function Player(num_lives)
           self.y + self.radius * (2 / 3 * math.sin(self.angle) + math.cos(self.angle))
         )
 
+        for _, laser in pairs(self.lasers) do
+          laser:draw(faded)
+        end
       else
         love.graphics.setColor(1, 0, 0, opacity)
         love.graphics.circle("fill", self.x, self.y, self.radius * 1.5)
@@ -126,16 +130,12 @@ function Player(num_lives)
 
         love.graphics.setColor(1, 234 / 255, 0, opacity)
         love.graphics.circle("fill", self.x, self.y, self.radius * 0.5)
-
-      end
-
-      for _, laser in pairs(self.lasers) do
-        laser:draw(faded)
       end
     end,
 
     drawLives = function (self, faded)
       local opacity = 1
+
       if faded then
         opacity = 0.2
       end
@@ -149,7 +149,6 @@ function Player(num_lives)
       end
 
       local x_pos, y_pos = 45, 30
-
       for i = 1, self.lives do
         if self.exploading then
           if i == self.lives then
@@ -170,8 +169,11 @@ function Player(num_lives)
     end,
 
     movePlayer = function (self, dt)
+
       if self.invincible then
+
         self.time_blinked = self.time_blinked - dt * 2
+
 
         if math.ceil(self.time_blinked) % 2 == 0 then
           self.invincible_seen = false
@@ -180,12 +182,13 @@ function Player(num_lives)
         end
 
         if self.time_blinked <= 0 then
-          self.invincible_seen = false
+          self.invincible = false
         end
       else
         self.time_blinked = USABLE_BLINKS
         self.invincible_seen = false
       end
+
       self.exploading = self.expload_time > 0
 
       if not self.exploading then
@@ -227,6 +230,7 @@ function Player(num_lives)
           self.y = -self.radius
         end
       end
+      
       for index, laser in pairs(self.lasers) do
         if (laser.distance > LASER_DISTANCE * love.graphics.getWidth())
         and (laser.exploading == 0) then
