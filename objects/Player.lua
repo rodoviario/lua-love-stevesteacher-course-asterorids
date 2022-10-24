@@ -5,7 +5,7 @@ local love = require "love"
 
 local Laser = require "objects/Laser"
 
-function Player(num_lives)
+function Player(num_lives, sfx)
   local SHIP_SIZE = 30
   local EXPLOAD_DUR = 3
   local VIEW_ANGLE = math.rad(90)
@@ -60,6 +60,7 @@ function Player(num_lives)
           self.y -  ((4 / 3) * self.radius) * math.sin(self.angle),
           self.angle
         ))
+        sfx:playFX("laser")
       end
     end,
 
@@ -208,7 +209,9 @@ function Player(num_lives)
         if self.thrusting then
           self.thrust.x = self.thrust.x + self.thrust.speed * math.cos(self.angle) / FPS
           self.thrust.y = self.thrust.y - self.thrust.speed * math.sin(self.angle) / FPS
+          sfx:playFX("thruster", "slow")
         else
+          sfx:stopFX("thruster")
           if self.thrust.x ~= 0 or self.thrust.y ~= 0 then
             self.thrust.x = self.thrust.x - friction * self.thrust.x / FPS
             self.thrust.y = self.thrust.y - friction * self.thrust.y / FPS
@@ -246,6 +249,7 @@ function Player(num_lives)
     end,
 
     expload = function (self)
+      sfx:playFX("ship_explosion")
       self.expload_time = math.ceil(EXPLOAD_DUR * love.timer.getFPS())
     end
   }
